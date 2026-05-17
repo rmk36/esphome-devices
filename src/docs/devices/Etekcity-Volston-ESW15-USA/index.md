@@ -8,8 +8,8 @@ difficulty: 3
 ---
 
 ## Product Images
-![A front view of the Etekcity Voltson ESW15-USA Smart Outlet.](TODO.jpg "Etekcity Voltson ESW15-USA Front View")
-![A back view of the Etekcity Voltson ESW15-USA Smart Outlet, displaying the sticker with all its product details.](TODO.jpg "Etekcity Voltson ESW15-USA Back View")
+![A front view of the Etekcity Voltson ESW15-USA Smart Outlet.](ESW15_Stock.png "Etekcity Voltson ESW15-USA Front View")
+![A back view of the Etekcity Voltson ESW15-USA Smart Outlet, displaying the sticker with all its product details.](IMG_1789.jpg "Etekcity Voltson ESW15-USA Back View")
 
 The Etekcity Voltson ESW15-USA is a Wi-Fi connected 15-amp Smart Outlet with energy monitoring, controlled via the VeSync app when running OEM firmware.
 
@@ -29,7 +29,9 @@ There are no screws. The plastic shell is held together by plastic clips.  You w
 The pictures below use black markings to show where the clips are located, depending on how you are holding the smart
 outlet when disassembling it.
 
-_TODO IMAGES_
+![Opening up the ESW15](IMG_1787.jpg)
+![](IMG_1788_2.jpg)
+![](IMG_1767.jpg)
 
 ## Flashing New Firmware
 
@@ -37,10 +39,8 @@ _TODO IMAGES_
 
 With the plastic shell separated, you will now have access to the top of the PCB.
 
-_TODO IMAGES_
-
-Because this model does not seem to allow the removal of the PCB without desoldering the plug, you will need to
-carefully solder wires to the visible test pads.
+![](IMG_1791.jpg)
+![](IMG_1792.jpg)
 
 Using the table below as a guide, connect each pin of a USB serial converter to its corresponding test pad on the PCB.
 
@@ -68,8 +68,6 @@ Follow the steps below to boot the ESP module into Flash Mode:
    the indicator LED lighting up solid yellow.
 4. Determine the COM port that the USB serial converter is attached to on the computer, and proceed by either backing up
    the firmware or flashing new firmware to the device.
-
-_TODO IMAGE_
 
 ### 3. Firmware Backup (optional)
 
@@ -122,17 +120,19 @@ running, or your instance does not meet the requirements to flash devices, you c
 
 ## ESP Home Configuration
 
-### GPIO Pinout TODO
+### GPIO Pinout
 
-| Pin    | Function       |
-| ------ | -------------- |
-| GPIO4  | Outlet Relay   |
-| GPIO5  | LED blue       |
-| GPIO12 | HLWBL CF1 Pin  |
-| GPIO13 | HLW8012 CF Pin |
-| GPIO14 | Button         |
-| GPIO15 | HLWBL SEL Pin  |
-| GPIO16 | LED yellow     |
+| Pin    | Function             |
+| ------ | -------------------- |
+| GPIO4  | Nightlight Output    |
+| GPIO5  | Outlet Relay         |
+| GPIO12 | HLWBL CF1 Pin        |
+| GPIO13 | HLW8012 CF Pin       |
+| GPIO14 | Button               |
+| GPIO15 | HLWBL SEL Pin        |
+| GPIO16 | LED blue             |
+| A0     | Ambient Light Sensor |
+
 
 ### Basic ESPHome Configuration TODO
 
