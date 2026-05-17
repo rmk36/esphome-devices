@@ -8,21 +8,19 @@ difficulty: 3
 ---
 
 ## Product Images
+![A front view of the Etekcity Voltson ESW15-USA Smart Outlet.](TODO.jpg "Etekcity Voltson ESW15-USA Front View")
+![A back view of the Etekcity Voltson ESW15-USA Smart Outlet, displaying the sticker with all its product details.](TODO.jpg "Etekcity Voltson ESW15-USA Back View")
 
-![A front view of the Etekcity Voltson ESW01-USA-R6P Smart Outlet.](Etekcity-Voltson-ESW01-USA-R6P-Front-View.jpg "Etekcity Voltson ESW01-USA-R6P Front View")
-![A back view of the Etekcity Voltson ESW01-USA-R6P Smart Outlet, displaying the sticker with all its product details.](Etekcity-Voltson-ESW01-USA-R6P-Back-View-Sticker.jpg "Etekcity Voltson ESW01-USA-R6P Back View")
-
-The Etekcity Voltson ESW01-USA-R6P is a Wi-Fi connected 10-amp Smart Outlet with energy monitoring, controlled via the
-VeSync app when running OEM firmware.
+The Etekcity Voltson ESW15-USA is a Wi-Fi connected 15-amp Smart Outlet with energy monitoring, controlled via the VeSync app when running OEM firmware.
 
 | Specification | Details                                                        |
 | ------------- | -------------------------------------------------------------- |
 | Manufacturer  | Etekcity                                                       |
-| Model         | Voltson ESW15-USA                                       |
+| Model         | Voltson ESW15-USA                                              |
 | Input         | AC 120V, 60Hz                                                  |
 | Max Load      | 15A resistive                                                  |
 | Environment   | 14°-104°F / -10°-40°C                                          |
-| FCC ID        | [2AB22-ESW15-USA2](https://fcc.report/FCC-ID/2AB22-ESW15-USA) |
+| FCC ID        | [2AB22-ESW15-USA2](https://fcc.report/FCC-ID/2AB22-ESW15-USA)  |
 
 ## Disassembly
 
@@ -31,8 +29,7 @@ There are no screws. The plastic shell is held together by plastic clips.  You w
 The pictures below use black markings to show where the clips are located, depending on how you are holding the smart
 outlet when disassembling it.
 
-![A top-down front view of an Etekcity Voltson ESW01-USA-R6P Smart Outlet. The outlet, button, and LED indicator are facing the viewer. Black marks around the circumference of the plug indicate the locations of the six clips of the plastic shell. The markings are positioned clockwise at 40°, 120°, 155°, 205°, 270°, and 325°.](Etekcity-Voltson-ESW01-USA-R6P-Clips-Front.jpg "Etekcity Voltson ESW01-USA-R6P Shell Clips Front View")
-![A top-down back view of the inside of the front shell of an Etekcity Voltson ESW01-USA-R6P Smart Outlet. There are black marks on each of the six clips of the plastic shell. The clips are positioned clockwise at 35°, 90°, 155°, 205°, 240°, and 320°.](Etekcity-Voltson-ESW01-USA-R6P-Clips-Back.jpg "Etekcity Voltson ESW01-USA-R6P Shell Clips Back View")
+_TODO IMAGES_
 
 ## Flashing New Firmware
 
@@ -40,7 +37,7 @@ outlet when disassembling it.
 
 With the plastic shell separated, you will now have access to the top of the PCB.
 
-![A top-down view of the Etekcity Voltson ESW01-USA-R6P's PCB. At the bottom of the PCB, there is an AI-Thinker ESP 01E module identifiable by its spring antenna. Below the ESP module, there are three test pads labeled, from left to right, as IO0, RX, and TX. Above and to the left of the ESP module, there are two test pads labeled, from left to right, as T5/5V and T4/GND.](Etekcity-Voltson-ESW01-USA-R6P-PCB.jpg "Etekcity Voltson ESW01-USA-R6P PCB")
+_TODO IMAGES_
 
 Because this model does not seem to allow the removal of the PCB without desoldering the plug, you will need to
 carefully solder wires to the visible test pads.
@@ -57,10 +54,6 @@ Using the table below as a guide, connect each pin of a USB serial converter to 
 
 **_NOTE:_** The IO0 test pad must be pulled low (grounded) during power on, it will put the ESP module into Flash Mode. You can either connect this to the GND pin of the USB serial converter or the GND test pad on the device. **You will need to disconnect this pad from ground for the device to boot normally. If you want to test the firmware before reassembling the plug, wire this in such a way that you can easily detach it from ground.**
 
-⚠ **WARNING:** While the AI-Thinker ESP 01E is typically powered by 3.3V, the test pad seems to be connected to other
-components on the board and requires 5V. Flashing using 3.3V on this test pad has been tested, but even though the
-installation reports success, the device does not seem to boot correctly afterward, even when powering it with 5V.
-
 ### 2. Boot Into Flash Mode
 
 When an ESP module is powered on normally, it will start executing the installed firmware. The ESP module needs to be
@@ -68,7 +61,7 @@ put into Flash Mode before its firmware can be erased, read, or written to.
 
 Follow the steps below to boot the ESP module into Flash Mode:
 
-1. With all the other pins correctly connected to the USB serial converter, disconnect the 5V VCC wire and plug the USB
+1. With all the other pins correctly connected to the USB serial converter, disconnect the 3.3V VCC wire and plug the USB
    serial converter into a USB port on a computer.
 2. Ensure the IO0 pin is pulled low (connected to any ground source) before proceeding.
 3. Plug the VCC wire back into the USB serial converter. The device should boot into Flash Mode, usually indicated by
@@ -76,7 +69,7 @@ Follow the steps below to boot the ESP module into Flash Mode:
 4. Determine the COM port that the USB serial converter is attached to on the computer, and proceed by either backing up
    the firmware or flashing new firmware to the device.
 
-![An angled view of the Etekcity Voltson ESW01-USA-R6P connected to a USB serial converter as described in the table above and booted into Flash Mode.](Etekcity-Voltson-ESW01-USA-R6P-USB-Serial-Converter.jpg "Etekcity Voltson ESW01-USA-R6P Connected to a USB serial converter and Booted into Flash Mode")
+_TODO IMAGE_
 
 ### 3. Firmware Backup (optional)
 
@@ -100,13 +93,13 @@ converter is attached to COM3.
 #### Backup Firmware
 
 ```bash
-.\esptool.exe -b 115200 --port COM3 read_flash 0 ALL Etekcity_Voltson_ESW01-USA-R6P_1M.bin
+.\esptool.exe -b 115200 --port COM3 read_flash 0 ALL Etekcity_Voltson_ESW15-USA.bin
 ```
 
 #### Restore Firmware
 
 ```bash
-.\esptool.exe -b 115200 --port COM3 write_flash 0 Etekcity_Voltson_ESW01-USA-R6P_1M.bin
+.\esptool.exe -b 115200 --port COM3 write_flash 0 Etekcity_Voltson_ESW15-USA.bin
 ```
 
 ### 4. Flashing ESPHome
@@ -129,7 +122,7 @@ running, or your instance does not meet the requirements to flash devices, you c
 
 ## ESP Home Configuration
 
-### GPIO Pinout
+### GPIO Pinout TODO
 
 | Pin    | Function       |
 | ------ | -------------- |
@@ -141,7 +134,7 @@ running, or your instance does not meet the requirements to flash devices, you c
 | GPIO15 | HLWBL SEL Pin  |
 | GPIO16 | LED yellow     |
 
-### Basic ESPHome Configuration
+### Basic ESPHome Configuration TODO
 
 The configuration below can be used when you initially set up the device to get its basic functionality. Comments and
 links are included to help you easily navigate the available options.
@@ -303,7 +296,7 @@ sensor:
     update_interval: 1s # How often sensor readings are taken.
 ```
 
-### Energy Monitoring Tuning
+### Energy Monitoring Tuning TODO
 
 Energy monitoring for this plug is provided by an HLW8012 module. Luckily for us, unlike some other models of this plug,
 this one has a GPIO pin (GPIO15) wired to the SEL pin of the HLW8012 module.
@@ -352,7 +345,7 @@ time: # More information available at https://esphome.io/components/time
     id: homeassistant_time
 ```
 
-### Debugging Component
+### Debugging Component TODO
 
 If you need to debug anything on the device, you can add the following:
 
