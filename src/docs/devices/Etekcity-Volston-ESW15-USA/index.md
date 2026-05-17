@@ -1,6 +1,6 @@
 ---  
 title: Etekcity ESW15
-date-published:  2026-04-11  
+date-published:  2026-05-16  
 type: plug  
 standard: us  
 board: esp8285
@@ -25,9 +25,6 @@ The Etekcity Voltson ESW15-USA is a Wi-Fi connected 15-amp Smart Outlet with ene
 ## Disassembly
 
 There are no screws. The plastic shell is held together by plastic clips.  You will a spudger to get between the seam of the plastic shell and disengage each of the 5 clips.
-
-The pictures below use black markings to show where the clips are located, depending on how you are holding the smart
-outlet when disassembling it.
 
 ![Opening up the ESW15](IMG_1787.jpg)
 ![](IMG_1788_2.jpg)
@@ -134,169 +131,217 @@ running, or your instance does not meet the requirements to flash devices, you c
 | A0     | Ambient Light Sensor |
 
 
-### Basic ESPHome Configuration TODO
+### Basic ESPHome Configuration 
 
-The configuration below can be used when you initially set up the device to get its basic functionality. Comments and
-links are included to help you easily navigate the available options.
 
-**⚠ IMPORTANT:** Please pay attention to any comments in the configurations below that start with "**⚠ SECURITY
-WARNING**". These comments highlight security features that are not necessary for the device to function normally but
-should be considered for additional security based on your personal risk tolerance.
 
 ```yaml
-##############################
-### Variable Substitutions ###
-##############################
-# More information available at https://esphome.io/guides/configuration-types#substitutions
-substitutions:
-  name: etek-city-outlet
-  friendly_name: Etek City Plug
-  throttle_average: 60s # How often average sensor values are published (this is NOT how often sensor readings are taken)
-  # HLW8012 Energy Monitoring Defaults for the Etekcity Voltson ESW01-USA-R6P
-  # These defaults are a good starting point for the Etekcity Voltson ESW01-USA-R6P. However, further tuning will yield the best results.
-  # More information on HLW8012 tuning is available at https://esphome.io/components/sensor/hlw8012
-  voltage_divider: "2017.5014044943819"
-  current_resistor: "0.0009273577235772359"
-  current_multiply: "1.0"
-
-##################################
-### ESPHome Core Configuration ###
-##################################
-# More information available at https://esphome.io/components/esphome.html
-
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-  # As of the publication of this guide, ESPHome Dashboard only seems to use the "name" of the device for mDNS lookups.
-  # This causes ESPHome Dashboard's DNS lookups to fail to resolve correctly, resulting in its failure to connect to your device.
-  # If you want to add the mac_suffix to the device name, consider adding it to the "name" value in the "substitutions" section.
-  # If you still want to enable the "name_add_mac_suffix" option, consider using the "manual_ip" option in the "wifi" section below so ESPHome Dashboard can find your device on the network.
-  name_add_mac_suffix: False
 
-# ESP8266 Platform Configuration
-# More information available at https://esphome.io/components/esp8266
 esp8266:
   board: esp01_1m
-  early_pin_init: False # ⚠ IMPORTANT: This setting will prevent the outlet from flickering on/off during reboots!
+  restore_from_flash: True
 
-##########################################
-### Connectivity & Additional Services ###
-##########################################
+preferences:
+  flash_write_interval: 60min
 
-# Enable Logging
-logger: # More information available athttps://esphome.io/components/logger
-  level: INFO # By default, the log level is DEBUG. Increasing the log level severity (e.g., to INFO or WARN) can help improve the performance and memory usage of the application.
+logger:
 
-wifi: # More information available at https://esphome.io/components/wifi
+api:
+
+ota:
+  - platform: esphome
+
+wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  # Optional Manual IP.
-  # NOTE: This is also useful when ESPHome Dashboard has problems resolving the mDNS name of the device after flashing.
-  #  manual_ip:
-  #    static_ip: 192.168.0.100
-  #    gateway: 192.168.0.1
-  #    subnet: 255.255.255.0
-
-  # The AP option will make the device broadcast an access point (AP) when the specified Wi-Fi cannot be reached.
-  # ⚠ SECURITY WARNING: Not specifying a password here will allow anyone who can see this AP to reconfigure your device!
+  min_auth_mode: WPA
+  domain: .lan
   ap:
-#    password: !secret wifi_password
+    {}
+  # Logic to handle the Status LED based on connectivity
+  on_connect:
+    - light.turn_off: status_led
+  on_disconnect:
+    - light.turn_on:
+        id: status_led
+        effect: "Blink"
 
-# This option along with the "ap" option allows a user to reconfigure the Wi-Fi connection.
-# NOTE: If the captive portal webpage is not loading, rebooting the plug may allow it to load.
-captive_portal: # More information available at https://esphome.io/components/captive_portal
+captive_portal:
 
-# Enables Home Assistant API
-api:# More information available at https://esphome.io/components/api
-  # ⚠ SECURITY WARNING: Not specifying an encryption key here will allow anyone on your network with the IP of the device to interact with the API!
-#  encryption: # The key value for the "encryption" option is a 32-byte base64 encoded string. A random one can be copied from https://esphome.io/components/api
-#    key: O3FXh9ceOxMU8swMRjlhGvvef4YkiVU8jmGkL/RbcMg=
+web_server:
+  version: 3
 
-# Allow Over-The-Air updates
-ota:# More information available at https://esphome.io/components/ota
-  # ⚠ SECURITY WARNING: Not specifying a password here will allow anyone on your network with the ip of the device to reflash a new binary!
-#  password: !secret ota_password
-
-# You can enable a web server to interact with the plug directly via your web browser.
-# ⚠ WARNING: Enabling this component will take up a lot of memory and may decrease overall stability, especially on devices with ESP8266 modules, which this device uses.
-# NOTE: This component is not required to interact with the plug via Home Assistant or the API.
-web_server: # More information available at https://esphome.io/components/web_server
-#  ota: False # ⚠ SECURITY WARNING: Keep in mind that even with an OTA password set, if OTA is enabled in the web server, anyone with access to the web server can reflash new firmware!
-#  auth: # ⚠ SECURITY WARNING: Not specifying a username and password here will allow anyone on your network with the IP of the device to interact with it!
-#    username: !secret web_server_username
-#    password: !secret web_server_password
-
-#############################################################
-### Etekcity Voltson ESW01-USA-R6P Specific Configuration ###
-#############################################################
-
-# Wi-Fi Link Status LED (Blue)
-status_led:
-  pin:
-    number: GPIO5
-
-# Outlet State LED (Yellow)
-output:
-  - platform: gpio
-    id: outlet_state_led
-    pin: GPIO16
-
-# Outlet Relay Button
-switch:
-  - platform: gpio
-    name: "Outlet"
-    id: outlet_relay
-    pin: GPIO4
-    restore_mode: RESTORE_DEFAULT_ON
-    on_turn_on:
-      - output.turn_on: outlet_state_led
-    on_turn_off:
-      - output.turn_off: outlet_state_led
-
-# Outlet Relay Toggle When Button Pushed
 binary_sensor:
+    # Button
   - platform: gpio
-    id: outlet_button
     pin:
       number: GPIO14
       mode: INPUT_PULLUP
       inverted: true
+    name: "Button"
     on_press:
-      - switch.toggle: outlet_relay
+      - switch.toggle: relay
 
+switch:
+   # Outlet Relay
+  - platform: gpio
+    name: "Outlet"
+    pin: GPIO5
+    id: relay
+    restore_mode: RESTORE_DEFAULT_OFF
+
+    # Internal Switch for auto nightlight logic
+  - platform: template
+    id: nightlight_gate
+    internal: true
+    optimistic: true
+    on_turn_on:
+      - script.execute: refresh_output
+    on_turn_off:
+      - script.execute: refresh_output
+
+number:
+  - platform: template
+    name: "Nightlight Brightness"
+    id: nightlight_brightness
+    min_value: 0
+    max_value: 100
+    step: 1
+    initial_value: 100
+    optimistic: true
+    on_value:
+      then:
+        - script.execute: refresh_output
+  
 sensor:
-  # Energy Monitoring via HLW8012 Module
-  # More information available at https://esphome.io/components/sensor/hlw8012
+  # Ambient Light Sensor (LDR)
+  - platform: adc
+    pin: A0
+    name: "Ambient Light Sensor"
+    id: ambient_light
+    update_interval: 1s
+    filters:
+      - multiply: 1.0 
+    # Trigger the script immediately when the light level changes
+    on_value:
+      then:
+        - script.execute: update_nightlight
+
+  # HLW8012 Power Monitoring
   - platform: hlw8012
     sel_pin: GPIO15
     cf_pin: GPIO13
     cf1_pin: GPIO12
-    # Energy Monitoring Tuning Options
-    current_resistor: ${current_resistor}
-    voltage_divider: ${voltage_divider}
+    current_resistor: 0.0009746397694524496
+    voltage_divider: 1966
     current:
-      id: current
-      name: Current
-      # Energy Monitoring Tuning Filter
-      filters:
-        - multiply: ${current_multiply}
-        - throttle_average: ${throttle_average}
+      name: "Current"
     voltage:
-      id: voltage
-      name: Voltage
-      filters:
-        - throttle_average: ${throttle_average}
+      name: "Voltage"
     power:
-      id: wattage
-      name: Wattage
-      filters:
-        - throttle_average: ${throttle_average}
-    initial_mode: voltage
-    change_mode_every: 8 # How many update intervals pass before the HLW8012 switches to (voltage or current) measurement modes.
-    update_interval: 1s # How often sensor readings are taken.
+      name: "Power"
+    energy:
+      name: "Energy"
+    change_mode_every: 3
+    update_interval: 5s
+
+light:
+    # Internal light handles the soft ramp (1s)
+  - platform: monochromatic
+    id: nightlight_managed
+    output: nightlight_pwm
+    internal: true
+    default_transition_length: 1s
+
+  # Blue Status LED - Marked internal to hide from HA
+  - platform: binary
+    id: status_led
+    output: status_led_out
+    internal: true
+    effects:
+      - strobe:
+          name: "Blink"
+          colors:
+            - state: true
+              duration: 0.5s
+            - state: false
+              duration: 0.5s
+
+output:
+  # PWM for dimming the nightlight
+  - platform: esp8266_pwm
+    pin: GPIO4
+    id: nightlight_pwm
+
+  # GPIO for status LED
+  - platform: gpio
+    pin: GPIO16
+    id: status_led_out
+
+select:
+    # Nightlight On/Off/Auto
+  - platform: template
+    name: "Nightlight Mode"
+    id: nightlight_mode
+    options:
+      - "On"
+      - "Off"
+      - "Auto"
+    initial_option: "Auto"
+    optimistic: true
+    on_value:
+      - script.execute: update_nightlight
+
+script:
+  # Logic: Transition internal light based on (Slider / 100) * Gate
+  - id: refresh_output
+    then:
+      - if:
+          condition:
+            lambda: 'return id(nightlight_gate).state;'
+          then:
+            - light.turn_on:
+                id: nightlight_managed
+                brightness: !lambda 'return id(nightlight_brightness).state / 100.0;'
+          else:
+            - light.turn_off: nightlight_managed
+
+  # This script only touches the "Gate", not the brightness
+  - id: update_nightlight
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return id(nightlight_mode).current_option() == "On";'
+          then:
+            - switch.turn_on: nightlight_gate
+      - if:
+          condition:
+            lambda: 'return id(nightlight_mode).current_option() == "Off";'
+          then:
+            - switch.turn_off: nightlight_gate
+      - if:
+          condition:
+            lambda: 'return id(nightlight_mode).current_option() == "Auto";'
+          then:
+            - lambda: |-
+                float current_lux = id(ambient_light).state;
+                // Deadband Logic:
+                // If it gets darker than 0.03, turn ON
+                if (current_lux < 0.03) {
+                  id(nightlight_gate).turn_on();
+                } 
+                // If it gets brighter than 0.05, turn OFF
+                else if (current_lux > 0.05) {
+                  id(nightlight_gate).turn_off();
+                }
+                // If it is between 0.03 and 0.05, do nothing (maintain state)
 ```
 
-### Energy Monitoring Tuning TODO
+### Energy Monitoring Tuning
 
 Energy monitoring for this plug is provided by an HLW8012 module. Luckily for us, unlike some other models of this plug,
 this one has a GPIO pin (GPIO15) wired to the SEL pin of the HLW8012 module.
@@ -304,75 +349,5 @@ this one has a GPIO pin (GPIO15) wired to the SEL pin of the HLW8012 module.
 This means we can switch between voltage and current monitoring. Some known good default values for voltage_divider,
 current_resistor, and current_multiply have been provided in the Basic Configuration.
 
-These values have been tuned with a FLUKE 87 and have been tested on a few of these plugs, yielding decent results.
-
 If you want to fine-tune the energy readings further, follow the instructions for the
 [HWL8012 module](https://esphome.io/components/sensor/hlw8012).
-
-### Total Daily Energy Sensor
-
-If you want to add an additional sensor to track total daily energy usage, add the following to your configuration:
-
-- A new platform entry named "total_daily_energy" under the "sensor" section.
-- A new section entry named "time".
-
-```yaml
-# Everything from the basic configuration should go here
-# ...
-
-sensor:
-  # The HLW8012 platform entry (required)
-  # All other sensor platform entries should go here
-  # ...
-
-  # Total Daily Energy Sensor
-  # More information available at https://esphome.io/components/sensor/total_daily_energy
-  - platform: total_daily_energy
-    name: "Total Daily Energy"
-    power_id: wattage
-    unit_of_measurement: "kWh"
-    state_class: total_increasing
-    device_class: energy
-    accuracy_decimals: 3
-    filters:
-      # Multiplication factor from W to kW is 0.001
-      - multiply: 0.001
-
-# Time Component
-# This will reset the "Total Daily Energy Sensor" to 0 at midnight, synced with Home Assistant's clock.
-time: # More information available at https://esphome.io/components/time
-  - platform: homeassistant
-    id: homeassistant_time
-```
-
-### Debugging Component TODO
-
-If you need to debug anything on the device, you can add the following:
-
-- A new platform entry named "debug" under the "sensor" section.
-- A new section entry named "debug".
-
-```yaml
-# Everything from the basic configuration should go here.
-# ...
-
-sensor:
-  # All other sensor platform entries should go here.
-  # ...
-
-  # Debug component
-  # More information at https://esphome.io/components/debug
-  - platform: debug
-    free:
-      name: "Heap Free"
-    fragmentation:
-      name: "Heap Fragmentation"
-    block:
-      name: "Heap Max Block"
-    loop_time:
-      name: "Loop Time"
-
-# Enable this to update the debugging sensor.
-debug:
-  update_interval: 5s
-```
